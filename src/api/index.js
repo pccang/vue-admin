@@ -1,38 +1,13 @@
 /**
- * @file: index.
- * @intro: api请求索引.
- * @author: zzmhot.
- * @email: zzmhot@163.com.
- * @Date: 2017/5/8 15:31.
- * @Copyright(©) 2017 by zzmhot.
- *
+ * @intro: api集合，将扫描modules下面的所有接口，并且根据路径生成驼峰命名为key.
  */
+let _result = {}
+// 驼峰命名转换
+const camelCaseChange = (str, separator = '/') => str.replace(new RegExp(`${separator}(\\w)`, 'g'), str => str.slice(1).toUpperCase())
+const context = require.context('./modules', true, /\.js$/)
+context.keys().map(item => {
+  const k = camelCaseChange(item.match(/\.\/(\S*)\.js$/)[1])
+  _result[k] = context(item)
+})
 
-//导入模块
-import * as api_file from './file'
-import * as api_table from './table'
-import * as api_user from './user'
-
-const apiObj = {
-  api_file,
-  api_table,
-  api_user
-}
-
-const install = function (Vue) {
-  if (install.installed) return
-  install.installed = true
-
-  //定义属性到Vue原型中
-  Object.defineProperties(Vue.prototype, {
-    $fetch: {
-      get() {
-        return apiObj
-      }
-    }
-  })
-}
-
-export default {
-  install
-}
+export default _result
